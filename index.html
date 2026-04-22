@@ -1,52 +1,31 @@
 <!DOCTYPE html>
-<html>
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>품질 관제 대시보드 연결 중...</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aircode 품질 관제 시스템 접속</title>
     <style>
-        body { background: #111827; color: #f3f4f6; display: flex; flex-direction: column; 
-               justify-content: center; align-items: center; height: 100vh; font-family: sans-serif; }
-        .loader { border: 4px solid #374151; border-top: 4px solid #3b82f6; border-radius: 50%; 
-                  width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom: 20px; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        :root { --primary: #3b82f6; --bg: #111827; --card: #1f2937; }
+        body { background: var(--bg); color: #fff; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; font-family: 'Pretendard', sans-serif; }
+        .card { background: var(--card); padding: 40px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); text-align: center; width: 350px; }
+        .logo { font-size: 24px; font-weight: 800; margin-bottom: 10px; color: var(--primary); }
+        .desc { color: #9ca3af; font-size: 14px; margin-bottom: 30px; line-height: 1.5; }
+        .btn { display: block; width: 100%; padding: 15px; margin: 10px 0; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.2s; text-decoration: none; }
+        .btn-internal { background: var(--primary); color: white; }
+        .btn-external { background: #374151; color: #d1d5db; }
+        .btn:hover { transform: translateY(-2px); filter: brightness(1.1); }
+        .footer { margin-top: 20px; font-size: 12px; color: #4b5563; }
     </style>
 </head>
 <body>
-    <div class="loader"></div>
-    <p id="status">접속 환경을 분석하고 있습니다...</p>
-
-    <script>
-        const internalUrl = "http://193.200.10.37:16080";
-        const externalUrl = "http://aircode-qa.duckdns.org:16080";
+    <div class="card">
+        <div class="logo">AIRCODE</div>
+        <div class="desc">현재 접속하신 네트워크 환경에 맞는<br>접속 방식을 선택해 주세요.</div>
         
-        let redirected = false;
-
-        // 💡 핵심 로직: 내부망 서버에 아주 가벼운 신호를 보내봅니다.
-        // favicon.ico는 모든 웹서버에 기본적으로 있어서 체크용으로 딱입니다.
-        const checkInternal = () => {
-            const img = new Image();
-            img.src = internalUrl + "/favicon.ico?" + Date.now(); // 캐시 방지용 타임스탬프
-            
-            img.onload = () => {
-                if (!redirected) {
-                    redirected = true;
-                    console.log("내부망 감지 - 사내망 주소로 이동합니다.");
-                    window.location.replace(internalUrl);
-                }
-            };
-        };
-
-        checkInternal();
-
-        // 💡 0.4초(400ms)만 기다려보고 응답 없으면 외부망으로 판단합니다.
-        setTimeout(() => {
-            if (!redirected) {
-                redirected = true;
-                console.log("외부망 감지 - DuckDNS 주소로 이동합니다.");
-                document.getElementById('status').innerText = "외부망 접속 중...";
-                window.location.replace(externalUrl);
-            }
-        }, 400);
-    </script>
+        <a href="http://193.200.10.37:16080" class="btn btn-internal">사내망 접속 (사무실)</a>
+        <a href="http://aircode-qa.duckdns.org:16080" class="btn btn-external">사외망 접속 (LTE/외부)</a>
+        
+        <div class="footer">플랫폼사업팀 품질 관제 시스템</div>
+    </div>
 </body>
 </html>
