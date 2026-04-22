@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>품질 관제 대시보드 연결 중...</title>
+    <style>
+        body { background: #111827; color: #f3f4f6; display: flex; flex-direction: column; 
+               justify-content: center; align-items: center; height: 100vh; font-family: sans-serif; }
+        .loader { border: 4px solid #374151; border-top: 4px solid #3b82f6; border-radius: 50%; 
+                  width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom: 20px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <div class="loader"></div>
+    <p id="status">접속 환경을 분석하고 있습니다...</p>
+
+    <script>
+        const internalUrl = "http://193.200.10.37:16080";
+        const externalUrl = "http://aircode-qa.duckdns.org:16080";
+        
+        let redirected = false;
+
+        // 💡 핵심 로직: 내부망 서버에 아주 가벼운 신호를 보내봅니다.
+        // favicon.ico는 모든 웹서버에 기본적으로 있어서 체크용으로 딱입니다.
+        const checkInternal = () => {
+            const img = new Image();
+            img.src = internalUrl + "/favicon.ico?" + Date.now(); // 캐시 방지용 타임스탬프
+            
+            img.onload = () => {
+                if (!redirected) {
+                    redirected = true;
+                    console.log("내부망 감지 - 사내망 주소로 이동합니다.");
+                    window.location.replace(internalUrl);
+                }
+            };
+        };
+
+        checkInternal();
+
+        // 💡 0.4초(400ms)만 기다려보고 응답 없으면 외부망으로 판단합니다.
+        setTimeout(() => {
+            if (!redirected) {
+                redirected = true;
+                console.log("외부망 감지 - DuckDNS 주소로 이동합니다.");
+                document.getElementById('status').innerText = "외부망 접속 중...";
+                window.location.replace(externalUrl);
+            }
+        }, 400);
+    </script>
+</body>
+</html>
